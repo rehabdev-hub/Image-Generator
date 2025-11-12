@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image Generator</title>
+    <title>AI Image Generator (Dark Theme)</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -14,8 +14,10 @@
                         sans: ['Inter', 'sans-serif'],
                     },
                     colors: {
-                        'primary': '#4f46e5',
-                        'primary-dark': '#4338ca',
+                        'primary': '#a78bfa', // Light purple for dark theme contrast
+                        'primary-dark': '#8b5cf6', // Slightly darker for hover
+                        'bg-dark': '#0d1117', // Deep, GitHub-like dark background
+                        'card-dark': '#161b22', // Slightly lighter card background
                     }
                 }
             }
@@ -25,16 +27,18 @@
         /* Custom styles for better aesthetic and handling aspect ratio */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
+            background-color: var(--tw-colors-bg-dark); /* Use defined dark color */
         }
         .aspect-ratio-box {
-            background-color: #e5e7eb;
+            /* Initial background for the image area, pre-generation */
+            background-color: var(--tw-colors-card-dark); 
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
             border-radius: 0.75rem; /* rounded-xl */
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(113, 128, 150, 0.2); /* Subtle gray border */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
         }
         .aspect-1-1 {
             aspect-ratio: 1 / 1;
@@ -47,7 +51,7 @@
         }
         .loading-spinner {
             border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #4f46e5;
+            border-top: 4px solid var(--tw-colors-primary);
             border-radius: 50%;
             width: 30px;
             height: 30px;
@@ -59,42 +63,42 @@
         }
     </style>
 </head>
-<body class="min-h-screen p-4 sm:p-8">
+<body class="min-h-screen p-4 sm:p-8 bg-bg-dark text-gray-100">
 
-    <div class="max-w-4xl mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-2xl">
-        <h1 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">
-            Gemini Image Generator
+    <div class="max-w-4xl mx-auto bg-card-dark p-6 sm:p-10 rounded-2xl shadow-2xl shadow-black/50">
+        <h1 class="text-3xl font-extrabold text-white mb-4 text-center">
+            🌌 AI Image Generator
         </h1>
-        <p class="text-gray-500 mb-8 text-center">
-            Describe the image you want, select an aspect ratio, and create!
+        <p class="text-gray-400 mb-8 text-center">
+            Describe the vision, select the format, and let the AI create the image.
         </p>
 
         <!-- Input Form -->
         <div class="space-y-6 mb-8">
             <div>
-                <label for="prompt" class="block text-sm font-medium text-gray-700 mb-2">Image Description (Prompt)</label>
-                <textarea id="prompt" rows="4" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary transition duration-150 ease-in-out" placeholder="e.g., A cyberpunk cat sitting on a neon sign in a rainy futuristic city, photorealistic, cinematic lighting."></textarea>
+                <label for="prompt" class="block text-sm font-medium text-gray-300 mb-2">Image Description (Prompt)</label>
+                <textarea id="prompt" rows="4" class="w-full p-4 border border-gray-700 rounded-xl shadow-inner text-white bg-gray-900 placeholder-gray-500 focus:ring-primary focus:border-primary transition duration-200 ease-in-out" placeholder="e.g., A minimalist abstract geometric sculpture floating in a deep space environment, high detail, volumetric lighting."></textarea>
             </div>
 
             <div>
-                <label for="aspectRatio" class="block text-sm font-medium text-gray-700 mb-2">Aspect Ratio</label>
-                <select id="aspectRatio" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary transition duration-150 ease-in-out">
+                <label for="aspectRatio" class="block text-sm font-medium text-gray-300 mb-2">Aspect Ratio</label>
+                <select id="aspectRatio" class="w-full p-4 border border-gray-700 rounded-xl shadow-inner text-white bg-gray-900 focus:ring-primary focus:border-primary transition duration-200 ease-in-out">
                     <option value="1:1">Square (1:1)</option>
                     <option value="16:9">Landscape (16:9)</option>
                     <option value="9:16">Portrait (9:16)</option>
                 </select>
             </div>
 
-            <button id="generateBtn" class="w-full flex justify-center items-center py-3 px-6 border border-transparent rounded-lg shadow-lg text-lg font-semibold text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-4 focus:ring-primary focus:ring-opacity-50 transition duration-300 ease-in-out" onclick="generateImage()">
+            <button id="generateBtn" class="w-full flex justify-center items-center py-4 px-6 border border-transparent rounded-xl shadow-lg text-lg font-bold text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-4 focus:ring-primary focus:ring-opacity-70 transition duration-300 ease-in-out transform hover:scale-[1.01]" onclick="generateImage()">
                 Generate Image
             </button>
         </div>
 
         <!-- Output Section -->
-        <div class="mt-10 border-t pt-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Result</h2>
-            <div id="imageOutputContainer" class="min-h-[200px] flex justify-center items-center">
-                <p id="initialMessage" class="text-gray-500 text-center p-4">Your generated image will appear here.</p>
+        <div class="mt-10 border-t border-gray-700 pt-8">
+            <h2 class="text-2xl font-bold text-white mb-6 text-center">Result</h2>
+            <div id="imageOutputContainer" class="min-h-[250px] flex justify-center items-center">
+                <p id="initialMessage" class="text-gray-400 text-center p-4">Your generated image will appear here. Choose your prompt and aspect ratio above.</p>
                 
                 <!-- Placeholder for the aspect-ratio-box and image -->
                 <div id="imagePlaceholder" class="w-full sm:w-3/4 max-w-lg hidden">
@@ -102,12 +106,14 @@
                         <div id="loadingIndicator" class="hidden loading-spinner"></div>
                         <img id="generatedImage" class="w-full h-full object-cover hidden" src="" alt="Generated AI Image">
                     </div>
+                    
                     <!-- Error/Status Message Box -->
-                    <div id="statusMessage" class="mt-4 p-3 rounded-lg text-center font-medium hidden"></div>
+                    <!-- Status message styling will be set dynamically in JS to ensure readability against the dark card background -->
+                    <div id="statusMessage" class="mt-4 p-3 rounded-xl text-center font-medium hidden"></div>
 
-                    <!-- NEW DOWNLOAD BUTTON -->
-                    <button id="downloadBtn" class="mt-4 w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-lg shadow-md text-sm font-semibold text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50 transition duration-300 ease-in-out hidden" onclick="downloadImage()">
-                        Download Image
+                    <!-- DOWNLOAD BUTTON -->
+                    <button id="downloadBtn" class="mt-4 w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-md text-base font-semibold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-600 focus:ring-opacity-70 transition duration-300 ease-in-out hidden" onclick="downloadImage()">
+                        ⬇️ Download Image
                     </button>
                 </div>
             </div>
@@ -131,21 +137,27 @@
         const loadingIndicator = document.getElementById('loadingIndicator');
         const generatedImage = document.getElementById('generatedImage');
         const statusMessage = document.getElementById('statusMessage');
-        const downloadBtn = document.getElementById('downloadBtn'); // NEW: Download button
+        const downloadBtn = document.getElementById('downloadBtn');
 
         /**
          * Generic function for displaying status/error messages.
+         * Tailwind classes updated for dark theme readability.
          * @param {string} message The message to display.
          * @param {string} type 'success' or 'error' for styling.
          */
         function showStatus(message, type) {
             statusMessage.textContent = message;
-            statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
+            statusMessage.classList.remove('hidden', 'bg-red-900/50', 'text-red-300', 'bg-green-900/50', 'text-green-300');
+            
+            // Clear existing background/text colors
+            statusMessage.className = 'mt-4 p-3 rounded-xl text-center font-medium';
+            
             if (type === 'error') {
-                statusMessage.classList.add('bg-red-100', 'text-red-700');
+                statusMessage.classList.add('bg-red-900/50', 'text-red-300');
             } else if (type === 'success') {
-                statusMessage.classList.add('bg-green-100', 'text-green-700');
+                statusMessage.classList.add('bg-green-900/50', 'text-green-300');
             }
+            statusMessage.classList.remove('hidden');
         }
 
         /**
@@ -159,16 +171,21 @@
             generatedImage.classList.add('hidden');
             loadingIndicator.classList.add('hidden');
             statusMessage.classList.add('hidden');
-            downloadBtn.classList.add('hidden'); // Hide download button when not ready
+            downloadBtn.classList.add('hidden');
             generateBtn.disabled = false;
-            generateBtn.textContent = 'Generate Image';
-            aspectBox.style.backgroundColor = '#e5e7eb'; // Default background
+            generateBtn.innerHTML = 'Generate Image'; // Reset button text
+            
+            // Set dark theme background colors for aspect box
+            const cardDarkColor = tailwind.config.theme.extend.colors['card-dark']; 
+            const loadingDarkColor = '#1f2937'; // A slightly different dark gray for loading state
+            
+            aspectBox.style.backgroundColor = cardDarkColor; // Default background when not loading
 
             if (state === 'loading') {
                 generateBtn.disabled = true;
                 generateBtn.innerHTML = '<div class="loading-spinner border-white border-t-2"></div><span class="ml-2">Generating...</span>';
                 loadingIndicator.classList.remove('hidden');
-                aspectBox.style.backgroundColor = '#f3f4f6'; // Light loading background
+                aspectBox.style.backgroundColor = loadingDarkColor; // Dark loading background
                 generatedImage.src = '';
             } else if (state === 'error') {
                 showStatus(message, 'error');
@@ -177,8 +194,8 @@
                     showStatus(message, 'success');
                 }
                 generatedImage.classList.remove('hidden');
-                aspectBox.style.backgroundColor = 'transparent';
-                downloadBtn.classList.remove('hidden'); // Show download button
+                aspectBox.style.backgroundColor = 'transparent'; // Let the image take over
+                downloadBtn.classList.remove('hidden');
             }
         }
 
